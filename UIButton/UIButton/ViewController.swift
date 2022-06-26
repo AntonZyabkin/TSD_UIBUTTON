@@ -14,10 +14,13 @@ class ViewController: UIViewController {
     var roundButton = UIButton ()
     var timer =  Timer ()
     var concNumber = 1
-    var nubmewOfRoundLabel = 0
+    var nubmewOfRoundLabel = 1
+    let textViewRound = UILabel (frame: CGRect(x: 70, y: 480, width: 300, height: 300))
 
     override func viewDidLoad() {
         
+        textViewRound.numberOfLines = 0
+        textViewRound.text = ""
         super.viewDidLoad()
         createTimerLabel ()
         createStartButton ()
@@ -30,8 +33,12 @@ class ViewController: UIViewController {
         view.addSubview(roundButton)
 
         
-        startButton.addTarget(self, action: #selector(startButtonDidPresed), for: .touchUpInside)
-        roundButton.addTarget(self, action: #selector(createRoundLabel), for: .touchUpInside)
+        startButton.addTarget(self,
+                              action: #selector(startButtonDidPresed),
+                              for: .touchUpInside)
+        roundButton.addTarget(self,
+                              action: #selector(createRoundLabel),
+                              for: .touchUpInside)
     }
 
     
@@ -47,13 +54,19 @@ class ViewController: UIViewController {
             concNumber = 1
             timer.invalidate()
             timerLabel.text = "00:00:00"
+            textViewRound.text = ""
+            nubmewOfRoundLabel = 0
         }
   
     }
     
     func start () {
         // Инициализируем и настроим таймер:
-        timer = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(changeTimeLabel), userInfo: NSDate(), repeats: true)
+        timer = Timer.scheduledTimer(timeInterval: 0.01,
+                                     target: self,
+                                     selector: #selector(changeTimeLabel),
+                                     userInfo: NSDate(),
+                                     repeats: true)
         timer.tolerance = 0.01
     }
     
@@ -63,24 +76,26 @@ class ViewController: UIViewController {
         
         let elapsed = -(self.timer.userInfo as! NSDate).timeIntervalSinceNow
         
-        let min = Int(elapsed/60)
-        let sec = Int(elapsed) % 60
-        let mSec = Int (elapsed * 100) % 100 < 10 ? "0\(Int (elapsed * 100) % 100)" : "\(Int (elapsed * 100) % 100)"
+        let min = Int(elapsed/60) < 10 ?
+        "0\(Int(elapsed/60))" :
+        "\(Int(elapsed/60))"
         
-        if sec < 10 && min < 10 {
-            timerLabel.text = "0\(min):0\(sec):\(mSec)"
-        } else if sec > 9 && min < 9 {
-            timerLabel.text = "0\(min):\(sec):\(mSec)"
-        } else {
-            timerLabel.text = "\(min):\(sec):\(mSec)"
-        }
+        let sec = Int(elapsed) % 60 < 10 ?
+        "0\(Int(elapsed) % 60)" :
+        "\(Int(elapsed) % 60)"
+        
+        let mSec = Int (elapsed * 100) % 100 < 10 ?
+        "0\(Int (elapsed * 100) % 100)" :
+        "\(Int (elapsed * 100) % 100)"
+        
+        timerLabel.text = "\(min):\(sec):\(mSec)"
     }
     
     func createTimerLabel () {
         
         timerLabel.frame = CGRect (x: 0, y: 180, width: 200, height: 50)
         timerLabel.center.x = view.center.x
-        timerLabel.text = "00 : 00"
+        timerLabel.text = "00:00:00"
         timerLabel.textAlignment = .center
         timerLabel.layer.cornerRadius = 20
         timerLabel.layer.masksToBounds = true
@@ -114,10 +129,9 @@ class ViewController: UIViewController {
     
     @objc func createRoundLabel () {
         animateView(roundButton)
-        let label = UILabel (frame: CGRect (x: 70, y: 480, width: 200, height: 50))
-        label.center.y = CGFloat(480 + nubmewOfRoundLabel *  20)
-        label.text = "\(nubmewOfRoundLabel) round: \(timerLabel.text!)"
-        view.addSubview(label)
+
+        textViewRound.text! += "\n\(nubmewOfRoundLabel) round: \(timerLabel.text!)"
+        view.addSubview(textViewRound)
         nubmewOfRoundLabel += 1
     }
     
